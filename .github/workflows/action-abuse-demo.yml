@@ -1,0 +1,129 @@
+name: Action Abuse Demonstration
+
+# This workflow demonstrates GitHub Actions abuse scenarios for security testing
+# WARNING: This is for educational/security testing purposes only
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  # Scenario 1: Malicious action from external source
+  malicious-action-demo:
+    runs-on: af-slim-prd  # Using AppsFlyer runner for security
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Demonstrate malicious action loading
+        run: |
+          echo "=== GITHUB ACTIONS ABUSE DEMONSTRATION ==="
+          echo "This demonstrates how malicious actions can be loaded"
+          echo "from external sources or compromised accounts"
+          echo ""
+          echo "Attack vectors:"
+          echo "1. Compromised action repositories"
+          echo "2. Typosquatting (actions/checkout vs actions/check0ut)"
+          echo "3. Supply chain attacks"
+          echo "4. Malicious forks of legitimate actions"
+          echo ""
+          echo "Current runner: ${{ runner.name }}"
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Actor: ${{ github.actor }}"
+      
+      - name: Simulate data exfiltration attempt
+        run: |
+          echo "=== SIMULATED DATA EXFILTRATION ==="
+          echo "In a real attack, malicious actions could:"
+          echo "- Access repository secrets"
+          echo "- Exfiltrate source code"
+          echo "- Access environment variables"
+          echo "- Compromise the runner environment"
+          echo ""
+          echo "Current environment variables (safe to show):"
+          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
+          echo "GITHUB_ACTOR: $GITHUB_ACTOR"
+          echo "GITHUB_REF: $GITHUB_REF"
+      
+      - name: Demonstrate privilege escalation
+        run: |
+          echo "=== PRIVILEGE ESCALATION DEMONSTRATION ==="
+          echo "Malicious actions could attempt to:"
+          echo "- Escalate privileges on the runner"
+          echo "- Access other repositories"
+          echo "- Modify workflow files"
+          echo "- Create backdoors"
+          echo ""
+          echo "Current user context:"
+          whoami
+          echo "Current directory:"
+          pwd
+          echo "Available commands:"
+          which git
+          which curl
+          which wget
+
+  # Scenario 2: Typosquatting attack simulation
+  typosquatting-demo:
+    runs-on: af-slim-prd
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Demonstrate typosquatting
+        run: |
+          echo "=== TYPOSQUATTING ATTACK DEMONSTRATION ==="
+          echo "Attackers create malicious actions with similar names:"
+          echo ""
+          echo "Legitimate: actions/checkout@v4"
+          echo "Malicious:  actions/check0ut@v1"
+          echo "Malicious:  actions/checkout-action@latest"
+          echo "Malicious:  actions/github-checkout@v1"
+          echo ""
+          echo "This demonstrates why pinning actions to specific"
+          echo "commit SHAs is crucial for security"
+      
+      - name: Show current action versions
+        run: |
+          echo "=== CURRENT ACTION VERSIONS ==="
+          echo "This workflow uses:"
+          echo "- actions/checkout@v4 (legitimate)"
+          echo ""
+          echo "Best practices:"
+          echo "1. Pin to specific commit SHA"
+          echo "2. Use official actions only"
+          echo "3. Review action source code"
+          echo "4. Use dependency scanning"
+
+  # Scenario 3: Supply chain attack simulation
+  supply-chain-demo:
+    runs-on: af-slim-prd
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Demonstrate supply chain attack
+        run: |
+          echo "=== SUPPLY CHAIN ATTACK DEMONSTRATION ===""
+          echo "Attackers can compromise legitimate action repositories:"
+          echo ""
+          echo "Attack methods:"
+          echo "1. Compromise maintainer accounts"
+          echo "2. Social engineering"
+          echo "3. Vulnerabilities in action dependencies"
+          echo "4. Malicious pull requests"
+          echo ""
+          echo "This shows why continuous monitoring and"
+          echo "action integrity verification is essential"
+      
+      - name: Show security recommendations
+        run: |
+          echo "=== SECURITY RECOMMENDATIONS ==="
+          echo "1. Use self-hosted runners (like we do with af-slim-prd)"
+          echo "2. Implement least privilege access"
+          echo "3. Monitor action usage and changes"
+          echo "4. Use action security scanning"
+          echo "5. Implement approval workflows for action updates"
+          echo "6. Use private action registries when possible"

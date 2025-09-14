@@ -1,0 +1,224 @@
+name: Advanced Action Abuse Demonstration
+
+# This workflow demonstrates advanced GitHub Actions abuse techniques
+# for professional security testing and awareness
+
+on:
+  workflow_dispatch:
+    inputs:
+      attack_type:
+        description: 'Type of attack to demonstrate'
+        required: true
+        default: 'reconnaissance'
+        type: choice
+        options:
+        - reconnaissance
+        - data_exfiltration
+        - privilege_escalation
+        - persistence
+
+jobs:
+  reconnaissance:
+    if: ${{ github.event.inputs.attack_type == 'reconnaissance' }}
+    runs-on: af-slim-prd
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Reconnaissance Phase
+        run: |
+          echo "=== RECONNAISSANCE PHASE ==="
+          echo "Gathering information about the target environment..."
+          echo ""
+          echo "Repository Information:"
+          echo "- Repository: ${{ github.repository }}"
+          echo "- Actor: ${{ github.actor }}"
+          echo "- Event: ${{ github.event_name }}"
+          echo "- Ref: ${{ github.ref }}"
+          echo "- SHA: ${{ github.sha }}"
+          echo ""
+          echo "Runner Information:"
+          echo "- Runner Name: ${{ runner.name }}"
+          echo "- Runner OS: ${{ runner.os }}"
+          echo "- Runner Architecture: ${{ runner.arch }}"
+          echo "- Runner Temp: ${{ runner.temp }}"
+          echo "- Runner Tool Cache: ${{ runner.tool_cache }}"
+          echo ""
+          echo "Environment Variables:"
+          env | grep -E "(GITHUB|RUNNER)" | sort
+      
+      - name: Network Reconnaissance
+        run: |
+          echo "=== NETWORK RECONNAISSANCE ==="
+          echo "Testing network connectivity and services..."
+          echo ""
+          echo "DNS Resolution:"
+          nslookup github.com || echo "DNS lookup failed"
+          echo ""
+          echo "HTTP Connectivity:"
+          curl -s -o /dev/null -w "GitHub API: %{http_code}\n" https://api.github.com || echo "GitHub API unreachable"
+          echo ""
+          echo "Available Network Tools:"
+          which curl wget nc telnet || echo "Limited network tools available"
+
+  data_exfiltration:
+    if: ${{ github.event.inputs.attack_type == 'data_exfiltration' }}
+    runs-on: af-slim-prd
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Data Exfiltration Simulation
+        run: |
+          echo "=== DATA EXFILTRATION SIMULATION ==="
+          echo "Simulating data collection and exfiltration..."
+          echo ""
+          echo "Collecting repository data:"
+          echo "- Repository structure:"
+          find . -type f -name "*.yml" -o -name "*.yaml" -o -name "*.json" | head -10
+          echo ""
+          echo "- Configuration files:"
+          find . -name "*.config" -o -name "*.conf" -o -name ".env*" | head -5
+          echo ""
+          echo "Simulating data packaging:"
+          tar -czf /tmp/collected_data.tar.gz .github/ *.md *.txt 2>/dev/null || echo "Data collection completed"
+          echo "Data package size: $(du -h /tmp/collected_data.tar.gz 2>/dev/null || echo 'N/A')"
+          echo ""
+          echo "In a real attack, this data could be exfiltrated to:"
+          echo "- External HTTP endpoints"
+          echo "- DNS exfiltration"
+          echo "- Cloud storage services"
+          echo "- Command and control servers"
+      
+      - name: Secret Discovery Simulation
+        run: |
+          echo "=== SECRET DISCOVERY SIMULATION ==="
+          echo "Searching for potential secrets in code..."
+          echo ""
+          echo "Common secret patterns (simulation):"
+          echo "- API keys: $(grep -r -i 'api.*key' . --include="*.yml" --include="*.yaml" --include="*.json" | wc -l) potential matches"
+          echo "- Tokens: $(grep -r -i 'token' . --include="*.yml" --include="*.yaml" --include="*.json" | wc -l) potential matches"
+          echo "- Passwords: $(grep -r -i 'password' . --include="*.yml" --include="*.yaml" --include="*.json" | wc -l) potential matches"
+          echo ""
+          echo "Environment variables (safe to show):"
+          env | grep -v -E "(SECRET|PASSWORD|TOKEN|KEY)" | head -10
+
+  privilege_escalation:
+    if: ${{ github.event.inputs.attack_type == 'privilege_escalation' }}
+    runs-on: af-slim-prd
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Privilege Escalation Attempts
+        run: |
+          echo "=== PRIVILEGE ESCALATION ATTEMPTS ==="
+          echo "Attempting various privilege escalation techniques..."
+          echo ""
+          echo "Current user context:"
+          whoami
+          id
+          echo ""
+          echo "System information:"
+          uname -a
+          echo ""
+          echo "Process information:"
+          ps aux | head -10
+          echo ""
+          echo "Network connections:"
+          netstat -an | head -10 || ss -tuln | head -10 || echo "Network tools not available"
+          echo ""
+          echo "File system permissions:"
+          ls -la /tmp
+          echo ""
+          echo "In a real attack, malicious actions could:"
+          echo "- Exploit kernel vulnerabilities"
+          echo "- Abuse sudo privileges"
+          echo "- Access other user processes"
+          echo "- Modify system configurations"
+      
+      - name: Container Escape Simulation
+        run: |
+          echo "=== CONTAINER ESCAPE SIMULATION ==="
+          echo "Checking for container escape opportunities..."
+          echo ""
+          echo "Container detection:"
+          if [ -f /.dockerenv ]; then
+            echo "Running in Docker container"
+          elif [ -f /proc/1/cgroup ] && grep -q docker /proc/1/cgroup; then
+            echo "Running in Docker container (detected via cgroup)"
+          else
+            echo "Not running in Docker container"
+          fi
+          echo ""
+          echo "Available capabilities:"
+          cat /proc/self/status | grep Cap || echo "Capabilities not available"
+          echo ""
+          echo "Mount points:"
+          mount | head -10
+
+  persistence:
+    if: ${{ github.event.inputs.attack_type == 'persistence' }}
+    runs-on: af-slim-prd
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Persistence Mechanisms
+        run: |
+          echo "=== PERSISTENCE MECHANISMS ===""
+          echo "Demonstrating various persistence techniques..."
+          echo ""
+          echo "1. Cron job persistence (simulation):"
+          echo "   - Malicious actions could add cron jobs"
+          echo "   - Schedule recurring malicious activities"
+          echo "   - Maintain access after workflow completion"
+          echo ""
+          echo "2. Service persistence (simulation):"
+          echo "   - Create malicious systemd services"
+          echo "   - Install backdoor services"
+          echo "   - Ensure automatic startup"
+          echo ""
+          echo "3. File system persistence (simulation):"
+          echo "   - Create hidden files and directories"
+          echo "   - Modify system configuration files"
+          echo "   - Install malicious binaries"
+          echo ""
+          echo "4. Network persistence (simulation):"
+          echo "   - Establish reverse shells"
+          echo "   - Create persistent network connections"
+          echo "   - Set up command and control channels"
+          echo ""
+          echo "Current system state:"
+          echo "- Running processes: $(ps aux | wc -l)"
+          echo "- Open files: $(lsof 2>/dev/null | wc -l || echo 'N/A')"
+          echo "- Network connections: $(netstat -an 2>/dev/null | wc -l || ss -tuln 2>/dev/null | wc -l || echo 'N/A')"
+      
+      - name: Backdoor Installation Simulation
+        run: |
+          echo "=== BACKDOOR INSTALLATION SIMULATION ==="
+          echo "Simulating backdoor installation techniques..."
+          echo ""
+          echo "1. Web shell creation (simulation):"
+          echo "   - Create malicious PHP/ASP files"
+          echo "   - Upload to web directories"
+          echo "   - Maintain web-based access"
+          echo ""
+          echo "2. SSH key injection (simulation):"
+          echo "   - Add malicious SSH keys"
+          echo "   - Create authorized_keys entries"
+          echo "   - Enable remote access"
+          echo ""
+          echo "3. Binary replacement (simulation):"
+          echo "   - Replace system binaries"
+          echo "   - Install trojaned versions"
+          echo "   - Maintain system access"
+          echo ""
+          echo "4. Configuration modification (simulation):"
+          echo "   - Modify system configurations"
+          echo "   - Change security settings"
+          echo "   - Disable security controls"
+          echo ""
+          echo "This demonstrates why monitoring and"
+          echo "integrity checking are essential for"
+          echo "GitHub Actions security"

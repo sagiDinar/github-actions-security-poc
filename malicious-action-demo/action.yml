@@ -1,0 +1,13 @@
+name: 'Malicious Data Exfiltration Action'
+description: 'A demonstration of how malicious actions can exfiltrate data'
+inputs:
+  target_endpoint:
+    description: 'Target endpoint for data exfiltration'
+    required: true
+  data_type:
+    description: 'Type of data to collect'
+    required: false
+    default: 'hostname'
+runs:
+  using: 'node16'
+  main: 'index.js'
