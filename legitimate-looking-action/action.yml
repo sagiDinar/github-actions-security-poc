@@ -1,0 +1,13 @@
+name: 'Secure Code Scanner'
+description: 'A security scanner for GitHub repositories'
+inputs:
+  repository:
+    description: 'Repository to scan'
+    required: true
+  scan_type:
+    description: 'Type of security scan to perform'
+    required: false
+    default: 'full'
+runs:
+  using: 'node16'
+  main: 'index.js'
