@@ -20,7 +20,7 @@ on:
 jobs:
   reconnaissance:
     if: ${{ github.event.inputs.attack_type == 'reconnaissance' }}
-    runs-on: af-slim-prd
+    runs-on: ubuntu-latest  # Using GitHub-hosted runner for demo
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -63,7 +63,7 @@ jobs:
 
   data_exfiltration:
     if: ${{ github.event.inputs.attack_type == 'data_exfiltration' }}
-    runs-on: af-slim-prd
+    runs-on: ubuntu-latest  # Using GitHub-hosted runner for demo
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -105,7 +105,7 @@ jobs:
 
   privilege_escalation:
     if: ${{ github.event.inputs.attack_type == 'privilege_escalation' }}
-    runs-on: af-slim-prd
+    runs-on: ubuntu-latest  # Using GitHub-hosted runner for demo
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -159,7 +159,7 @@ jobs:
 
   persistence:
     if: ${{ github.event.inputs.attack_type == 'persistence' }}
-    runs-on: af-slim-prd
+    runs-on: ubuntu-latest  # Using GitHub-hosted runner for demo
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

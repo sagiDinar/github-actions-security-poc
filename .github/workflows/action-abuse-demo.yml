@@ -11,7 +11,7 @@ on:
 jobs:
   # Scenario 1: Malicious action from external source
   malicious-action-demo:
-    runs-on: af-slim-prd  # Using AppsFlyer runner for security
+    runs-on: ubuntu-latest  # Using GitHub-hosted runner for demo
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
